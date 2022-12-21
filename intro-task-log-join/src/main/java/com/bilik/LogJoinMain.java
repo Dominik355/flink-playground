@@ -155,6 +155,7 @@ public class Main {
 
         @Override
         public void process(ProcessAllWindowFunction<Result, Result, TimeWindow>.Context context, Iterable<Result> elements, Collector<Result> out) throws Exception {
+            System.out.println("deduplicating: ");
             // get rid of duplicated
             for (Iterator<Result> iterator = elements.iterator(); iterator.hasNext(); ) {
                 Result current = iterator.next();
