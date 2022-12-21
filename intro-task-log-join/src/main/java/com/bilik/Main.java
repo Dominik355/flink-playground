@@ -171,7 +171,7 @@ public class Main {
                     out.collect(result);
                 }
             }
-            resultsMap = new HashMap<>();
+            resultsMap.clear();
         }
     }
 
