@@ -1,0 +1,3 @@
+WatermarkStrategy.<Integer>forMonotonousTimestamps()
+            .withidlenedd
+            .withWatermarkAlignment

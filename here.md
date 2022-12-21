@@ -1,0 +1,1 @@
+https://training.ververica.com/pages/slides?mode=presenter
