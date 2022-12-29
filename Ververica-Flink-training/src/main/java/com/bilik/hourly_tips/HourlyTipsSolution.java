@@ -1,4 +1,4 @@
-package com.bilik.window;
+package com.bilik.hourly_tips;
 
 import com.bilik.common.datatypes.TaxiFare;
 import com.bilik.common.sources.TaxiFareGenerator;
@@ -16,34 +16,23 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-/**
- * Java reference implementation for the Hourly Tips exercise from the Flink training.
- *
- * <p>The task of the exercise is to first calculate the total tips collected by each driver, hour
- * by hour, and then from that stream, find the highest tip total in each hour.
- */
-public class HourlyTipsSolutionForTesting {
+public class HourlyTipsSolution {
 
     private final SourceFunction<TaxiFare> source;
     private final SinkFunction<Tuple3<Long, Long, Float>> sink;
 
-    /** Creates a job using the source and sink provided. */
-    public HourlyTipsSolutionForTesting(
-            SourceFunction<TaxiFare> source, SinkFunction<Tuple3<Long, Long, Float>> sink) {
-
+    /**
+     * Creates a job using the source and sink provided.
+     * Having source and sink like parameters, makes testing easier for us.
+     */
+    public HourlyTipsSolution(SourceFunction<TaxiFare> source, SinkFunction<Tuple3<Long, Long, Float>> sink) {
         this.source = source;
         this.sink = sink;
     }
 
-    /**
-     * Main method.
-     *
-     * @throws Exception which occurs during job execution.
-     */
     public static void main(String[] args) throws Exception {
 
-        HourlyTipsSolutionForTesting job =
-                new HourlyTipsSolutionForTesting(new TaxiFareGenerator(), new PrintSinkFunction<>());
+        HourlyTipsSolution job = new HourlyTipsSolution(new TaxiFareGenerator(), new PrintSinkFunction<>());
 
         job.execute();
     }
@@ -109,4 +98,5 @@ public class HourlyTipsSolutionForTesting {
             out.collect(Tuple3.of(context.window().getEnd(), key, sumOfTips));
         }
     }
+
 }

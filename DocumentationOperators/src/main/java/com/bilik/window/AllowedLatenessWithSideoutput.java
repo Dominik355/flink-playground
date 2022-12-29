@@ -24,7 +24,7 @@ public class AllowedLatenessWithSideoutput {
                         .withTimestampAssigner((element, recordTimestamp) -> element.getTimestamp()))
                 .keyBy(StringEvent::getName)
                 .window(TumblingEventTimeWindows.of(Time.minutes(1)))
-                //.allowedLateness(Time.minutes(1)) // if we enable this, all the events will be processed, because ther is no bigger gap than a minute
+                //.allowedLateness(Time.minutes(1)) // if we enable this, all the events will be processed, because there is no bigger gap than a minute
                 .sideOutputLateData(new OutputTag<>("side-output-tag"){}) // must always be an anonymous inner class so that Flink can derive a TypeInformation for the generic type parameter
                 .process(new AllowedLateness.PrinterProcess());
 

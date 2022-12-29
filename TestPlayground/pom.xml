@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.bilik</groupId>
-    <artifactId>intro-task-log-join</artifactId>
+    <artifactId>TestPlayground</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -41,18 +41,13 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java</artifactId>
             <version>${flink.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients</artifactId>
             <version>${flink.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-csv</artifactId>
-            <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- TEST dependencies -->
@@ -63,10 +58,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Needed for AbstractStreamOperatorTestHarness -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-files</artifactId>
-            <version>${flink.version}</version>
+            <artifactId>flink-streaming-java_2.11</artifactId>
+            <version>1.14.4</version>
+            <scope>test</scope>
+            <classifier>tests</classifier>
         </dependency>
 
         <!-- Add connector dependencies here. They must be in the default scope (compile). -->
@@ -148,7 +146,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.bilik.LogJoinMain</mainClass>
+                                    <mainClass>com.bilik.Example1Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -157,4 +155,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

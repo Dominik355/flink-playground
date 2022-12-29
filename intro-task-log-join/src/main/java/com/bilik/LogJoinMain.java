@@ -30,7 +30,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class Main {
+public class LogJoinMain {
 
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -155,8 +155,7 @@ public class Main {
 
         @Override
         public void process(ProcessAllWindowFunction<Result, Result, TimeWindow>.Context context, Iterable<Result> elements, Collector<Result> out) throws Exception {
-            System.out.println("deduplicating: ");
-            // get rid of duplicated
+            // get rid of duplicates
             for (Iterator<Result> iterator = elements.iterator(); iterator.hasNext(); ) {
                 Result current = iterator.next();
                 Tuple2<Long, Long> key = new Tuple2<>(current.getTimestamp(), current.getRandomId());

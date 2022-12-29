@@ -1,4 +1,4 @@
-package org.example;
+package com.bilik;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.accumulators.IntCounter;
@@ -8,9 +8,6 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Example of using environment accumulator.
@@ -29,7 +26,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        DataStream<String> strings = env.fromCollection(IntStream.range(0, 100).boxed().collect(Collectors.toList()))
+        DataStream<String> strings = env.fromSequence(0, 100).map(Long::intValue)
                     .map(new MyMapFunction());
 
 
