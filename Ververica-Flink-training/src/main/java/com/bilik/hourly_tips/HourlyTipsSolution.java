@@ -67,10 +67,7 @@ public class HourlyTipsSolution {
         DataStream<Tuple3<Long, Long, Float>> hourlyMax =
                 hourlyTips.windowAll(TumblingEventTimeWindows.of(Time.hours(1))).maxBy(2);
 
-        /* You should explore how this alternative (commented out below) behaves.
-         * In what ways is the same as, and different from, the solution above (using a windowAll)?
-         */
-        // it finds biggest hour tip for each driver
+        // it finds biggest hour tip for each driver - it has to wait for stream to end (no window there)
         // DataStream<Tuple3<Long, Long, Float>> hourlyMax = hourlyTips.keyBy(t -> t.f0).maxBy(2);
 
         hourlyMax.addSink(sink);

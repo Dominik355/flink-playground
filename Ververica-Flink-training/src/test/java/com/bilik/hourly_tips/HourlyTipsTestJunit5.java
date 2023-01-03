@@ -1,7 +1,6 @@
-package com.bilik.window;
+package com.bilik.hourly_tips;
 
-import com.bilik.common.ComposedPipeline;
-import com.bilik.common.ExecutablePipeline;
+import com.bilik.common.FlinkMiniClusterExtension;
 import com.bilik.common.ParallelTestSource;
 import com.bilik.common.TestSink;
 import com.bilik.common.datatypes.TaxiFare;
@@ -10,10 +9,9 @@ import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.test.util.MiniClusterWithClientResource;
-
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.apache.flink.test.junit5.MiniClusterExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,22 +19,44 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class HourlyTipsTest {
+/**
+ * Up to Date with v1.16
+ *
+ * This is kinda tricky, because flink has no full support for Junit5
+ *
+ * Main port is replacing ClassRules with Extensions. As we can see, com.bilik.common.MiniClusterWithClientResource
+ * extends ExternalResource, which is a base class for Rules that set up an external resource before
+ * a test.
+ *
+ * We got 2 options ot implement it into Junit5 :
+ * https://stackoverflow.com/questions/73297418/how-is-flink-integration-testing-working-without-the-documented-flink-test-utils
+ *
+ * 1. Create own Extension (See {@link com.bilik.common.FlinkMiniClusterExtension})
+ * Use like this: "@ExtendWith(FlinkMiniClusterExtension.class)"
+ *
+ *
+ * 2. Use Experimental Extension from Flink
+ * See class {@link org.apache.flink.test.junit5.MiniClusterExtension}
+ * This class is still just Experimental, but what it does ?
+ * It internally uses InternalMiniClusterExtension, which internally uses MiniClusterResource,
+ * which is again Junit4 classRule Resource. So we do the same with extra stuff of clearing
+ * the environment after every test and setting it up again before every test
+ *
+ * How fast are they ? both probably same
+ */
+//@ExtendWith(FlinkMiniClusterExtension.class) //comment to use Flink Extension
+public class HourlyTipsTestJunit5 {
 
-    private static final int PARALLELISM = 2;
-
-//    /** This isn't necessary, but speeds up the tests. */
-//    @ClassRule
-//    public static MiniClusterWithClientResource flinkCluster =
-//            new MiniClusterWithClientResource(
-//                    new MiniClusterResourceConfiguration.Builder()
-//                            .setNumberSlotsPerTaskManager(PARALLELISM)
-//                            .setNumberTaskManagers(1)
-//                            .build());
+    // Comment to use Own Extension
+    @RegisterExtension
+    public static final MiniClusterExtension MINI_CLUSTER_RESOURCE = new MiniClusterExtension(
+            new MiniClusterResourceConfiguration.Builder()
+                    .setNumberSlotsPerTaskManager(2)
+                    .setNumberTaskManagers(1)
+                    .build());
 
     @Test
     public void testOneDriverOneTip() throws Exception {
-
         TaxiFare one = testFare(1, t(0), 1.0F);
 
         ParallelTestSource<TaxiFare> source = new ParallelTestSource<>(one);
@@ -85,8 +105,11 @@ public class HourlyTipsTest {
         Tuple3<Long, Long, Float> hour1 = Tuple3.of(t(60).toEpochMilli(), 1L, 6.0F);
         Tuple3<Long, Long, Float> hour2 = Tuple3.of(t(120).toEpochMilli(), 2L, 20.0F);
 
-        assertThat(results(source)).containsExactlyInAnyOrder(hour1, hour2);
+        assertThat(results(source))
+                .containsExactlyInAnyOrder(hour1, hour2);
     }
+
+    //**************************** HELPER METHODS ****************************
 
     public Instant t(int minutes) {
         return DataGenerator.BEGINNING.plus(Duration.ofMinutes(minutes));
@@ -96,20 +119,10 @@ public class HourlyTipsTest {
         return new TaxiFare(0, 0, driverId, startTime, "", tip, 0F, 0F);
     }
 
-    private ComposedPipeline<TaxiFare, Tuple3<Long, Long, Float>> hourlyTipsPipeline() {
-
-        ExecutablePipeline<TaxiFare, Tuple3<Long, Long, Float>> exercise =
-                (source, sink) -> new HourlyTipsSolutionForTesting(source, sink).execute();
-
-        ExecutablePipeline<TaxiFare, Tuple3<Long, Long, Float>> solution =
-                (source, sink) -> new HourlyTipsSolutionForTesting(source, sink).execute();
-
-        return new ComposedPipeline<>(exercise, solution);
-    }
-
     protected List<Tuple3<Long, Long, Float>> results(SourceFunction<TaxiFare> source) throws Exception {
         TestSink<Tuple3<Long, Long, Float>> sink = new TestSink<>();
-        JobExecutionResult jobResult = hourlyTipsPipeline().execute(source, sink);
+        JobExecutionResult jobResult = new HourlyTipsSolution(source, sink).execute();
         return sink.getResults(jobResult);
     }
+
 }

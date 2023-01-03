@@ -25,6 +25,7 @@ public class ParallelTestSource<T> extends RichParallelSourceFunction<T> impleme
         // the elements of the testStream are assigned to the parallel instances in a round-robin fashion
         for (T element : testStream) {
             if (subtask == indexOfThisSubtask) {
+                System.out.println(String.format("indexOfThisSubtask[%s]     numberOfParallelSubtasks[%s]     subtask[%s]      Sending[%s]", indexOfThisSubtask, numberOfParallelSubtasks, subtask, element));
                 ctx.collect(element);
             }
             subtask = (subtask + 1) % numberOfParallelSubtasks;

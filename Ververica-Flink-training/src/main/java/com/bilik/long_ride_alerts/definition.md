@@ -3,8 +3,10 @@ lasts for more than two hours.
 
 This should be done using the event time timestamps and watermarks that are provided in the data stream.
 
-The stream is out-of-order, and it is possible that the END event for a ride will be processed before
-its START event.
+The stream is out-of-order, and it is possible that the END event for a ride will be processed before  its START event.\
+Well this is dumb, because if START can not be missing and END can come earlier, that could shift our watermark by hours. 
+So, this might make sense only, if It was immediatelly cancelled. And then, we do not even measure duraiton between those 2 events.\
+But because we are not windowing here, so we do not need
 
 An END event may be missing, but you may assume there are no duplicated events, and no missing START events.
 

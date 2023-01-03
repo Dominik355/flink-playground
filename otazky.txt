@@ -1,0 +1,5 @@
+ako sa meni watermark podla event timu, ak napriklad zacnu chodit ojneskorene eventy .
+Majme watermark na 14:41:23 a zacnu chodit eventy z 14:40 ... cize watermarky, ktore sa generuju maju aku hodnotu ?
+Predpokladam, ze naspet v case ist nemozu, takze emituju poslednu najvyssiu hodnotu, teda 14:41:23 aj ked prichadzaju oneskorene eventy ?
+A ako to je napriklad s timerom. Ako sa zavola, pokial flinku nedavame vediet, ze cas sa posuva. Ten by o posune cas uvediet nemal, pokial pouzivame cisto
+eventTime a nie processing, teda flink nepouziva nejake vlastne hodiny.
